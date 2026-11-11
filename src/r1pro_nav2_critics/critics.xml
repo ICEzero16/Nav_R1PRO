@@ -1,0 +1,5 @@
+<library path="goal_orientation">
+  <class type="r1pro_nav2_critics::GoalOrientationCritic" base_class_type="dwb_core::TrajectoryCritic">
+    <description>Penalizes final goal yaw error while translating.</description>
+  </class>
+</library>

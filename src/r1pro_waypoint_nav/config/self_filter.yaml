@@ -1,0 +1,21 @@
+r1pro_self_filter:
+  ros__parameters:
+    padding: 0.025
+    # Only above the chassis deck; coordinates are metres in base_link.
+    deck_sparse_bounds: [-0.393, -0.337, 0.41, 0.234, 0.337, 0.70]
+    deck_neighbor_radius: 0.04
+    deck_min_points: 4
+    # Measured base_link bounds in metres, including clearance. The extra
+    # volume above the padded deck (z=0.43615) is 13 x 14 x 2.5 cm.
+    base_top_patch_bounds: [0.04, 0.04, 0.435, 0.17, 0.18, 0.46115]
+    # Build scripts/build_cuda.sh before using cuda; cpu is an explicit fallback.
+    crop_backend: cuda
+    outlier_enabled: true
+    # Range is measured from the original lidar coordinate origin, in meters.
+    outlier_mean_k: 16
+    outlier_method: range
+    outlier_std_multiplier: 3.0
+    outlier_range_edges: [2.0, 5.0, 10.0, 20.0]
+    outlier_min_bin_points: 64
+    # Conservative floor: never reject more than legacy global 2-sigma SOR.
+    outlier_global_floor_std: 2.0

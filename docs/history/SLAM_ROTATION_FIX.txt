@@ -1,0 +1,27 @@
+2026-11-10: rotation-only SLAM did not grow the map
+
+Evidence: offline deserialization of
+maps/rotation_trial_20261110_195611/posegraph.data contained ONE scan.
+420 input scans and 8 map messages were recorded, but map publication count
+did not establish content changes. The web API showed the current trial map.
+
+Humble upstream shouldProcessScan has a distance-only prefilter:
+https://github.com/SteveMacenski/slam_toolbox/blob/humble/src/slam_toolbox_common.cpp
+With minimum_travel_distance=0.1, a rotation with about 1 cm drift fails it.
+
+The managed child now overrides both native motion thresholds to zero.
+SlamManager selects keyframes at timestamped odom poses using translation
+>=0.1 m OR wrapped yaw change >=0.1 rad. Both are configurable manager
+parameters: keyframe_distance and keyframe_heading. The reference advances
+only when a native accepted pose has its corresponding timestamped odometry.
+The native minimum_time_interval remains 0.1 s. Stationary jitter is suppressed.
+New generations clear the selection reference and progress counters.
+
+SLAM status now distinguishes relayed_scans, accepted_scans, map_messages and
+map_content_updates (first map counts as version 1; header timestamps excluded).
+The web shows accepted frame count and content versions. Rotation trials save
+their data but report failure if no map content change or fewer than two new
+accepted keyframes occurred. No automatic extra rotation is performed.
+
+Validation is offline only; no motion or new mapping service was started for
+this repair. A new physical run is still needed to validate scan matching.

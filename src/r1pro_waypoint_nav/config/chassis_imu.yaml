@@ -1,0 +1,9 @@
+r1pro_chassis_imu:
+  ros__parameters:
+    # Empirical planar Z mapping for the inspected HDAS build, not full XYZ calibration.
+    yaw_scale: -0.017453292519943295
+    yaw_bias_raw: 0.0
+    # Conservative initial covariance in (rad/s)^2, not a sensor datasheet value.
+    yaw_variance: 0.0025
+    max_rate: 2.0
+    max_age: 0.15

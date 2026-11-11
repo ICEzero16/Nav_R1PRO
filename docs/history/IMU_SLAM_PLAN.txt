@@ -1,0 +1,48 @@
+R1PRO IMU adaptation and planar SLAM plan — 2026-11-10
+
+Implemented:
+Input /hdas/imu_chassis, output /r1pro_nav/imu_chassis_planar.
+Only angular_velocity.z is a valid measurement: (raw_z - bias_raw) * (-pi/180).
+This empirical mapping is supported by two rotation directions and binary inspection of the active HDAS build.
+It is NOT a claim that all sensor axes have been calibrated or the manufacturer's physical units were documented.
+The output is a virtual planar measurement in base_link; X/Y angular variances are 1e6.
+Orientation and acceleration covariance[0] are -1 (unavailable). Do not fuse them.
+No acceleration sign flip is guessed. No absolute quaternion is copied from the driver.
+Original message/timestamp are retained unchanged at source; output copies the stamp.
+HDAS stamps are host publication times, not verified hardware acquisition times.
+Default yaw variance 0.0025 (rad/s)^2 is a conservative engineering starting value, not a datasheet value.
+Reject nonfinite, implausible, stale/future and nonmonotonic yaw measurements.
+No automatic bias estimation during motion. Bias remains zero unless explicitly calibrated while stationary.
+The independent existing Livox IMU adapter is unchanged.
+The sensors launch includes the chassis IMU adapter when explicitly started.
+It has now been exercised by bounded stationary SLAM trials; see SLAM_TRIAL_README.txt.
+
+SLAM design:
+1. MID360 -> timestamped TF body crop (CUDA) -> range-aware outlier rejection (one CPU worker)
+   -> pointcloud_to_laserscan -> /r1pro_nav/scan.
+2. /r1pro_nav/odom twist vx,vy + adapted chassis gyro wz -> robot_localization planar EKF.
+   Do not also fuse the wheel-integrated pose from the same measurements.
+   Robot is holonomic: vy is a real measurement and must not be forced to zero.
+3. EKF is the sole publisher of odom -> base_link in slam_trial.launch.py; adapter publish_tf remains false.
+4. slam_toolbox asynchronous mapping uses scan + odom/base TF; it does not consume the IMU directly.
+   It publishes map -> odom and an occupancy map. Existing grid resolution is 0.05 m.
+5. Save both occupancy map and pose graph; later use AMCL/Nav2 for waypoint navigation.
+
+Prepared configuration:
+config/ekf_planar_candidate.yaml (experimental; standalone publish_tf=false).
+slam_trial.launch.py explicitly enables EKF TF and starts the complete mapping data path.
+scripts/run_slam_trial.py bounds the run, checks feedback health, saves map/graph, and stops owned processes.
+The legacy mapping.launch.py starts only slam_toolbox and is not the complete trial entry point.
+
+Required next verification, before continuous live mapping:
+- Replay both wheel feedback and adapted gyro together; check yaw drift, latency, covariance and estimator reset behavior.
+- Verify actual scan height slice/coverage during motion. Bounded trial refuses existing odom TF/components.
+- Bounded trial checks stale wheel/gyro/scan/odom/status; EKF prediction alone is not proof that localization is healthy.
+- Investigate the observed 260 ms feedback interruption. Do not silently integrate across missing displacement.
+- Short supervised slow motion, compare walls before/after turning and closed-loop map consistency.
+- Distance scale remains unmeasured; lack of a tape measure does not make it calibrated.
+- Full 3D lidar-inertial SLAM (e.g. FAST-LIO) requires full IMU axes/units plus reliable timestamp/extrinsic validation.
+
+Sources:
+https://github.com/cra-ros-pkg/robot_localization/blob/rolling-devel/doc/configuring_robot_localization.rst
+https://index.ros.org/p/slam_toolbox/

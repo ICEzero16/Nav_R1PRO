@@ -1,0 +1,15 @@
+r1pro_scan:
+  ros__parameters:
+    target_frame: livox_frame
+    transform_tolerance: 0.1
+    # Relative to lidar; input is TF-body-filtered and range-SOR-denoised.
+    # Height slice is provisional; verify walls and low obstacles during motion.
+    min_height: -0.10
+    max_height: 0.8
+    angle_min: -3.141592653589793
+    angle_max: 3.141592653589793
+    angle_increment: 0.008726646259971648
+    scan_time: 0.1
+    range_min: 0.3
+    range_max: 12.0
+    use_inf: true

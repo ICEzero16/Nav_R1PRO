@@ -1,0 +1,49 @@
+Filtering optimization, 2026-11-10
+
+Implemented and compiled on R1PRO; no robot movement, sensor capture, or ROS
+service startup during this change. New code is used on the next filter launch.
+
+1. Exact single-thread nearest-neighbor mean reduction in native/knn_mean.cpp.
+   Uses installed nanoflann, builds one index per cloud, reuses fixed per-query
+   scratch space, returns N means rather than N*(k+1) distances and indices.
+   No approximation, parameter relaxation, extra compute threads or CUDA change.
+   Build: bash scripts/build_knn.sh
+   Default R1PRO_KNN_BACKEND=auto uses native when available, otherwise SciPy.
+   Set R1PRO_KNN_BACKEND=scipy before starting the filter for the old query path.
+   Native calculation errors fail the frame; they do not silently pass points.
+
+2. Temporal history caches all-point and active-point search indices. Active
+   indices are invalidated whenever historical votes are removed. Frame expiry
+   and reset discard the caches. Motion and persistence semantics are unchanged.
+
+3. Self-filter scheduling selects the newest frame whose complete timestamped
+   body TF is available. Superseded older pending frames are counted and dropped.
+   A newer frame still waiting for TF is retained while an older ready frame can
+   be processed. The existing timestamp freshness and TF timeout limits remain.
+   No latest-TF substitution or guessed joint pose is introduced.
+
+4. Self-filter status adds stage_ms (queue_wait, tf_prepare, unpack, crop,
+   visualization, outlier, publish), queue_superseded, and output_age_ms.
+
+Validation: 103 offline tests passed. Tests create message objects and mock
+callbacks, not ROS nodes. Native means agree with SciPy within 2e-14 on random,
+duplicate, planar/linear and mixed-range inputs at k=2,16,128; output masks match.
+Queue callback tests verify frame timestamps and all serialized point fields.
+
+Saved three-frame benchmark (12 measured trials/frame, alternating order):
+  Frame 1: 52.95 -> 27.20 ms
+  Frame 2: 50.85 -> 27.07 ms
+  Frame 3: 51.24 -> 26.81 ms
+All saved-cloud masks exactly identical; thresholds agree within 1e-12.
+Temporal synthetic sequences (80 frames, 3 repeats; warmup excluded):
+  Static: 9.06 -> 7.61 ms; rotating: 9.27 -> 7.84 ms;
+  moving obstacle: 9.99 -> 8.62 ms. Masks and diagnostics match exactly.
+
+These are offline timings on the robot, not measured live FPS or live latency.
+Next verification should profile the same live pipeline and motion window to
+measure queue supersession, TF waits and end-to-end age under actual load.
+Benchmark: python3 scripts/benchmark_filter_engineering.py
+Report: reports/filter_engineering_20261110_203244.json
+
+The compiled native module incorporates the installed nanoflann header.
+See THIRD_PARTY_NANOFLANN.txt for its BSD license notice.

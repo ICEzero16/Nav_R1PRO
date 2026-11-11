@@ -1,0 +1,31 @@
+{
+  "footprint": [
+    [
+      0.26,
+      0.34
+    ],
+    [
+      -0.4,
+      0.34
+    ],
+    [
+      -0.4,
+      -0.34
+    ],
+    [
+      0.26,
+      -0.34
+    ]
+  ],
+  "footprint_padding": 0.03,
+  "global_radius": 0.57,
+  "inflation_radius": 0.82,
+  "cost_scaling_factor": 3.0,
+  "min_obstacle_height": 0.05,
+  "max_obstacle_height": 1.7,
+  "description_sha256": "1d7989e567862e66933913849b2de54479c73706413644e4061ebef081dbb79e",
+  "geometry_stamp_ns": 1794315225851425571,
+  "posture_policy": "fixed_measured_envelope",
+  "linear_speed": 0.2,
+  "yaw_speed": 0.12
+}

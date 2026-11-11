@@ -1,0 +1,46 @@
+Panels:
+- Class: rviz_common/Displays
+  Name: Displays
+- Class: rviz_common/Views
+  Name: Views
+Visualization Manager:
+  Class: ''
+  Global Options:
+    Fixed Frame: odom
+    Background Color: 35; 35; 40
+    Frame Rate: 20
+  Displays:
+  - Class: rviz_default_plugins/Grid
+    Name: Ground grid
+    Enabled: true
+    Value: true
+  - Class: rviz_default_plugins/Odometry
+    Name: Provisional wheel odometry
+    Enabled: true
+    Value: true
+    Topic:
+      Value: /r1pro_nav/odom
+      Reliability Policy: Best Effort
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Depth: 5
+    Keep: 200
+    Position Tolerance: 0.02
+    Angle Tolerance: 0.02
+  Tools:
+  - Class: rviz_default_plugins/Interact
+  - Class: rviz_default_plugins/MoveCamera
+  - Class: rviz_default_plugins/Select
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 8.0
+      Focal Point:
+        X: 0.0
+        Y: 0.0
+        Z: 0.0
+      Pitch: 0.8
+      Yaw: 0.8
+Window Geometry:
+  Width: 1200
+  Height: 800

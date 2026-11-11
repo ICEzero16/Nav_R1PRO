@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>R1PRO · 建图工作台</title><link rel="stylesheet" href="/map.css"></head>
+<body><header><a class="brand" href="/">R1<span>建图工作台<small>R1PRO / MAPPING</small></span></a><div class="header-actions"><a href="/index.html">传感器观察台 ↗</a><span id="connection" class="badge">连接中</span></div></header>
+<main><section class="intro"><div><p class="eyebrow">SPATIAL WORKSPACE</p><h1>地图与路径规划</h1><p>查看机器人定位，在地图上选择目标并预览路径。</p></div><div class="origin-pill"><i></i>固定坐标系 <strong>map</strong></div></section>
+<section class="stats"><article><span>地图来源</span><strong id="source">等待连接</strong><small id="sourceDetail">读取建图状态</small></article><article><span>栅格分辨率</span><strong id="resolution">—</strong><small>每个像素对应的实际距离</small></article><article><span>地图边界尺寸</span><strong id="extent">—</strong><small>包含尚未观测的区域</small></article><article><span>机器人位置</span><strong id="pose">—</strong><small id="poseDetail">等待地图坐标下的定位</small></article></section>
+<div class="workspace"><section class="map-panel"><div class="toolbar"><div><span class="live-dot" id="liveDot"></span><strong>二维栅格地图</strong><span id="mapAge">尚无数据</span></div><div class="view-buttons"><button id="zoomOut" aria-label="缩小">−</button><button id="zoomIn" aria-label="放大">＋</button><button id="fit">适应地图</button><button id="origin">查看原点</button><button id="clearTrail" type="button" disabled>清除行驶轨迹</button></div></div>
+<div class="map-wrap"><canvas id="mapCanvas" aria-label="当前地图，支持拖动平移和滚轮缩放"></canvas><div id="empty"><span>◎</span><strong>等待地图</strong><p>网页不会自动启动雷达或建图。</p></div><div class="map-label"><span id="viewLabel">MAP / 等待数据</span><small>＋ 标记 map 原点 (0, 0)</small></div><div class="map-bottom"><span><i class="free"></i>空闲 <i class="occupied"></i>障碍 <i class="unknown"></i>未知 <i class="robot"></i>当前底盘 <i class="goal-key"></i>目标底盘</span><span id="scale">拖动平移 · 滚轮缩放</span></div></div>
+<div class="map-foot"><span id="mapDescription">实时地图优先；未运行建图时显示最近保存的地图。</span><span>坐标单位 m</span></div></section>
+<aside><section class="card plan-card"><h2>目标规划</h2>
+<fieldset class="pick-modes"><legend>选点方式</legend>
+<button id="continuousGoal" type="button" aria-pressed="false">连续选点</button>
+<button id="pickGoal" type="button" aria-pressed="false">单击选点</button></fieldset>
+<p id="planHint" role="status">点击「单击选点」，或开启「连续选点」。</p>
+<output id="goalXY">尚未选择目标</output>
+<label for="goalYaw">目标朝向 <output id="yawValue">—</output></label>
+<input id="goalYaw" type="range" min="-180" max="180" step="1" value="0" disabled>
+<div class="plan-actions"><button id="confirmGoal" disabled>确认并移动</button><button id="cancelGoal" disabled>取消规划</button></div>
+<small><span id="driveState" role="status">正在连接底盘</span></small></section><section class="card"><p class="eyebrow">MAPPING SESSION</p><h2>建图状态</h2><div class="state-row"><span id="slamState">未连接</span><span id="generation">—</span></div><p id="stateDetail" class="muted">正在检查建图管理器。</p><dl><div><dt>坐标系原点</dt><dd>保持不变</dd></div><div><dt>里程计</dt><dd>重置时继续运行</dd></div><div><dt>最高平移速度</dt><dd id="driveSpeed">—</dd></div></dl></section>
+<section class="card reset-card"><p class="eyebrow">START FRESH</p><h2>重置当前地图</h2><p>清空本轮建图内容，继续在原来的 map 坐标系中建图。机器人当前位置不会被设为新原点。</p><button id="resetMap" class="reset-button" disabled>重置地图 · 保留原点</button><small id="resetHint">仅在实时建图就绪时可用。</small></section>
+<section class="card subtle"><h3>读图提示</h3><p>灰色区域表示未知，并不代表可以通行。保存的地图与实时地图会明确区分；旧地图不叠加当前机器人位置。</p></section></aside></div>
+<div id="notice" role="status" hidden></div><footer><span>R1PRO · 本地建图界面</span><span id="updated">—</span></footer></main>
+<dialog id="resetDialog"><form method="dialog"><p class="eyebrow">RESET MAP</p><h2>清空当前地图，保留原点？</h2><p>当前建图内容与 SLAM 历史将清空，并保存重置前的栅格快照。EKF 与传感器继续运行，map 原点和坐标方向保持不变。</p><p class="muted">重新接收扫描后会开始生成新地图。此操作不会移动机器人。</p><div class="dialog-actions"><button id="cancelReset" value="cancel">取消</button><button id="confirmReset" class="reset-button" type="button">确认重置</button></div></form></dialog>
+<script src="/map_geometry.js"></script><script src="/map.js"></script></body></html>

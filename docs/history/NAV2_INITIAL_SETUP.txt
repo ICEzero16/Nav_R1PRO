@@ -1,0 +1,63 @@
+Nav2 initial integration, 2026-11-10
+
+Implemented: saved-map localization configuration, global/local costmaps,
+SMAC 2D planning, omnidirectional DWB control, velocity smoothing, collision
+monitoring and waypoint client. Commands currently end at private preview
+topics. NO hardware velocity publisher/bridge is included in this launch.
+Do not describe this configuration as validated autonomous physical navigation.
+
+Measured whole-body URDF/TF envelope in base_link, 46 boxes, current posture:
+  X [-0.39703, +0.25957] m; Y [-0.33748, +0.33748] m; height 1.5041 m.
+  Local rectangle X [-0.40,+0.26], Y [-0.34,+0.34], padding 0.03 m.
+  Global conservative turn envelope radius 0.57 m (includes padding).
+  Inflation radius 0.82 m, cost scaling factor 3.0. The outer inflation band
+  is a graded cost, not an additional 0.82 m solid wall around the footprint.
+  Unknown map cells remain unknown and global planning disallows unknown space.
+The global circular approximation is conservative in narrow passages. A later
+orientation-aware planner can exploit rectangular-body clearance if needed.
+The profile is valid for this measured arm/head posture; update the profile
+or add a live footprint monitor before navigating with changing arm postures.
+
+Data flow:
+  EKF /r1pro_nav/odom_fused and odom -> base_link.
+  AMCL /r1pro_nav/scan_raw -> map -> odom, with OmniMotionModel.
+  Both obstacle layers and collision monitor use /r1pro_nav/points_filtered:
+  body crop only, with 0.05..1.70 m height in the target frame. Mapping-only
+  temporal rejection must NOT hide moving obstacles from navigation.
+  controller -> /r1pro_nav/nav2/cmd_vel_raw
+  smoother   -> /r1pro_nav/nav2/cmd_vel_smoothed
+  monitor    -> /r1pro_nav/nav2/cmd_vel_safe (preview endpoint, no chassis link)
+  NavigateToPose action: /navigate_to_pose (verified on installed Humble).
+  Speed limits: 0.05 m/s translation norm, 0.12 rad/s yaw.
+  Controller 10 Hz, smoother 20 Hz, local costmap 10 Hz, global costmap 2 Hz.
+No automatic spin or reverse recovery behaviors are present in these BTs.
+
+Generate/install (does not start robot services):
+  source scripts/env.bash
+  python3 scripts/capture_navigation_geometry.py  # bounded read-only TF/URDF
+  python3 scripts/prepare_nav2.py                 # changes Nav2 config only
+  colcon build --packages-select r1pro_waypoint_nav --symlink-install --executor sequential
+
+Preview launch, when explicitly ready to start perception/localization:
+  ros2 launch r1pro_waypoint_nav navigation.launch.py \
+    map:=/home/nvidia/ict_src/r1pro_navigation_ws/maps/rotation_trial_20261110_204505/map.yaml \
+    start_sensors:=true start_lidar:=true
+Do not run alongside SLAM or another odometry/map TF owner. If sensors/EKF
+already run, leave start_sensors=false and reuse them. AMCL needs the robot's
+initial pose in this saved map via /initialpose; do not infer it from a newer
+odometry origin. This initial physical localization has not been validated.
+
+Isolated test (synthetic inputs; never controls the robot):
+  source scripts/env.bash
+  ROS_DOMAIN_ID=178 OPENBLAS_NUM_THREADS=1 python3 tests/check_nav2_measured.py
+Tested actual saved map with synthetic TF/clouds: all six navigation nodes
+active, path produced, insufficient-clearance goal rejected, private commands
+bounded, inserted obstacle causes stop, zero hardware publishers, and unknown
+cells preserved. External TF mode is test-only evidence; it does not establish
+AMCL convergence on the physical robot. Test report and costmap preview are in
+reports/nav2_measured_check. Tests are shut down after completion.
+
+Remaining before physical autonomous trials: initialize and verify AMCL,
+validate near-ground blind spots and footprint against actual surroundings,
+implement/validate an explicitly enabled chassis bridge with feedback watchdog
+and emergency stop, then run an authorized short-distance goal test.

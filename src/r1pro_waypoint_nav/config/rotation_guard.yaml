@@ -1,0 +1,29 @@
+# Diagnostic jitter is recoverable; invalid primary odometry and physical
+# faults remain hard stops. This file does not authorize robot movement.
+rotation_guard:
+  diagnostic_grace_sec: 0.8
+  recovery_stable_sec: 0.8
+  max_pause_sec: 5.0
+  max_total_pause_sec: 10.0
+  max_pause_count: 3
+  status_timeout_sec: 2.5
+  imu_timeout_sec: 0.2
+  scan_timeout_sec: 0.6
+  fused_timeout_sec: 0.25
+  wheel_timeout_sec: 0.15
+  controller_timeout_sec: 0.2
+  motor_status_timeout_sec: 2.0
+  command_ttl_sec: 0.2
+  wheel_max_gap_sec: 0.2
+  feedback_max_age_sec: 0.15
+  max_command_time_sec: 20.0
+  max_turn_wall_sec: 35.0
+  max_linear_speed: 0.05
+  max_yaw_speed: 0.25
+  max_translation: 0.06
+  angle_margin_deg: 3.0
+  reverse_angle_rad: 0.03
+  imu_difference_rad: 0.10
+  imu_difference_ratio: 0.15
+  no_response_sec: 3.0
+  no_response_deg: 1.0

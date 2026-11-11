@@ -1,0 +1,38 @@
+# Generated ROS / native build files
+/build/
+/install/
+/log/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.so
+*.o
+
+# Recorded maps, scans and local verification outputs
+/maps/
+/captures/
+/backups/
+/crop_check/
+/nav2_plan_test/
+/reports/*
+# The dashboard and Nav2 configuration generator require this measured geometry.
+!/reports/navigation_geometry.json
+*.bag
+*.db3
+*.mcap
+*.npz
+*.tgz
+*.tar.gz
+
+# Machine-local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.ssh/
+.codex/
+.agents/
+/AGENTS.md
+.DS_Store
+Thumbs.db

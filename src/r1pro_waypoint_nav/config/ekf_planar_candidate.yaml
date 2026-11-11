@@ -1,0 +1,22 @@
+# Experimental planar EKF, included by slam_trial.launch.py.
+# The trial launch enables TF; standalone use defaults to no TF publication.
+r1pro_ekf:
+  ros__parameters:
+    frequency: 30.0
+    sensor_timeout: 0.2
+    two_d_mode: true
+    publish_tf: false
+    map_frame: map
+    odom_frame: odom
+    base_link_frame: base_link
+    world_frame: odom
+    twist0: /r1pro_nav/chassis_twist
+    # x y z roll pitch yaw vx vy vz vroll vpitch vyaw ax ay az
+    twist0_config: [false, false, false, false, false, false, true, true, false, false, false, false, false, false, false]
+    twist0_queue_size: 10
+    imu0: /r1pro_nav/imu_chassis_planar
+    imu0_config: [false, false, false, false, false, false, false, false, false, false, false, true, false, false, false]
+    imu0_queue_size: 20
+    imu0_differential: false
+    imu0_remove_gravitational_acceleration: false
+    use_control: false

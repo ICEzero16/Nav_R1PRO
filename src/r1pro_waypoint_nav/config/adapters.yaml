@@ -1,0 +1,12 @@
+r1pro_nav_adapters:
+  ros__parameters:
+    calibration_confirmed: false
+    publish_tf: false
+    imu_units_confirmed: false
+    # Candidate Livox scales only; never applied until explicitly confirmed.
+    imu_accel_scale: 9.80665
+    imu_gyro_scale: 1.0
+    imu_accel_variance: 0.04
+    imu_gyro_variance: 0.0025
+    max_age: 0.3
+    max_gap: 0.2

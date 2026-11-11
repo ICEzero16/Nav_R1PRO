@@ -1,0 +1,25 @@
+r1pro_temporal_scan:
+  ros__parameters:
+    fixed_frame: odom
+    window_sec: 1.2
+    max_frames: 12
+    min_hits: 3
+    min_span_sec: 0.4
+    min_frame_interval: 0.06
+    max_gap_sec: 0.5
+    match_radius: 0.06
+    range_radius_scale: 0.005
+    max_match_radius: 0.12
+    clear_margin: 0.20
+    cluster_gap: 0.20
+    cluster_range_scale: 0.01
+    cluster_min_points: 3
+    cluster_max_width: 1.5
+    max_tracks: 128
+    track_timeout: 0.4
+    track_max_speed: 2.5
+    motion_min_span: 0.25
+    motion_min_displacement: 0.12
+    motion_min_speed: 0.20
+    motion_hold_sec: 1.0
+    max_scan_points: 4096

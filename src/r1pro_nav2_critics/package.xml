@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>r1pro_nav2_critics</name>
+  <version>0.1.0</version>
+  <description>Goal orientation scoring during holonomic path following.</description>
+  <maintainer email="nvidia@example.invalid">R1PRO navigation</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>dwb_core</depend>
+  <depend>pluginlib</depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

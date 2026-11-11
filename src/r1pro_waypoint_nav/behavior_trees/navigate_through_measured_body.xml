@@ -1,0 +1,13 @@
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <PipelineSequence name="ReplanAndFollow">
+      <RateController hz="1.0">
+        <ReactiveSequence>
+          <RemovePassedGoals input_goals="{goals}" output_goals="{goals}" radius="0.15"/>
+          <ComputePathThroughPoses goals="{goals}" path="{path}" planner_id="GridBased"/>
+        </ReactiveSequence>
+      </RateController>
+      <FollowPath path="{path}" controller_id="FollowPath" goal_checker_id="general_goal_checker"/>
+    </PipelineSequence>
+  </BehaviorTree>
+</root>
